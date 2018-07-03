@@ -1,0 +1,15 @@
+#version 330 core
+
+layout (location = 0) in vec3 aPos;
+
+uniform mat4 View;
+uniform mat4 Projection;
+
+uniform vec3 color;
+
+out vec3 in_color;
+
+void main() {
+	in_color = color;
+	gl_Position = Projection * View * vec4(aPos, 1.0);
+}
