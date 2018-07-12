@@ -72,17 +72,42 @@ int main() {
 	pl::string vertexP = "Shaders\\shader.vertexshader";
 	pl::string fragmentP = "Shaders\\shader.fragmentshader";
 	Shader* g_shader = new Shader(vertexP, fragmentP);
+	//director->setShader(g_shader);
 
 	unsigned int g_size = 10;
 	Grid grid_floor(10, 10);
 
-
 	Object* obj = new Object;
-	Mesh* mesh = new Mesh("testefile.ple");
+	//Mesh* mesh = new Mesh("Models\\Misc\\cubies.ple");
+	Mesh* mesh = new Mesh("Models\\Revolver\\Colt_Python.ple");
+	(*mesh)[0]->addTexture("Models\\Revolver\\diffuse.tga", TYPE_DIFFUSE);
+	//Mesh* mesh = new Mesh("Models\\Coffe\\cup_low_poly.ple");
+	//(*mesh)[0]->addTexture("Models\\Coffe\\cup_BaseColor.tga", TYPE_DIFFUSE);
 	obj->addComponent(mesh);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	Object* cup = new Object;
+	Mesh* meshCup = new Mesh("Models\\Coffe\\cup_low_poly.ple");
+	(*meshCup)[0]->addTexture("Models\\Coffe\\cup_BaseColor.tga", TYPE_DIFFUSE);
+	cup->addComponent(meshCup);
 
+	obj->getComponent<Transform*>()->setPosition(glm::vec3(2.f, 1.f, 1.f));
+	cup->getComponent<Transform*>()->setPosition(glm::vec3(1.f, 2.f, 0.f));
+
+	//tmp
+	obj->getComponent<Transform*>()->setScale(0.08f);
+	cup->getComponent<Transform*>()->setScale(0.08f);
+	subMesh* m = (*mesh)[0];
+
+	Object* cubies = new Object;
+	Mesh* meshCubies = new Mesh("Models\\Misc\\cubies.ple");
+	cubies->addComponent(meshCubies);
+	cubies->getComponent<Transform*>()->setPositionX(-10.f);
+
+	director->getCamera()->setPositionY(4.f);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	float zz = 0;
 	while (glfwGetKey(director->getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(director->getWindow()) == 0) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwPollEvents();
@@ -174,21 +199,20 @@ int main() {
 					camera->addPitch(mouseY);
 				}
 			}
-
-			GLuint MatrixID = glGetUniformLocation(shader->getID(), "MVP");
-
-			glm::mat4 Projection = glm::perspective(camera->getFov(), (GLfloat)ImGui::GetWindowWidth() / (GLfloat)(ImGui::GetWindowHeight() * .93f), 0.1f, 1000.0f);
-			glm::mat4 View = camera->getViewMatrix();
-			glm::mat4 Model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, 0.f));
-			glm::mat4 MVP = Projection * View * Model;
+			director->getCamera()->c_Width = ImGui::GetWindowWidth();
+			director->getCamera()->c_Height = ImGui::GetWindowHeight() * .93f;
 
 			glEnable(GL_DEPTH_TEST);
-			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 			grid_floor.Draw(camera, glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight() * .93f));
 		}
-
-		obj->getComponent<Mesh*>()->Draw(director);
+		obj->getComponent<Transform*>()->setRotationY(sin(zz+=0.05f));
+		//(*mesh)[0]->s_transform->setRotation(glm::vec3(zz += 0.1f));
+		obj->draw(director);
+		cup->draw(director);
+		cubies->draw(director);
+		cubies->getComponent<Transform*>()->setPositionX((zz += 0.05f));
+		(*meshCubies)[1]->s_transform->setPositionX(sin(zz += 0.1f));
 
 		{
 			// OpenGL view
