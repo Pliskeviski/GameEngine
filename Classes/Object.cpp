@@ -20,4 +20,10 @@ bool Object::isActive() {
 	return this->Active;
 }
 
+void Object::draw(Core::Director* director) {
+	Mesh* o_mesh = this->getComponent<Mesh*>();
+	if(o_mesh != NULL)
+		o_mesh->Draw(director, this->getComponent<Transform*>());
+}
+
 

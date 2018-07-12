@@ -137,6 +137,9 @@ public:
 	void Right(float v);
 	void Left(float v);
 
+
+	float c_Width;
+	float c_Height;
 private:
 	void Update();
 
@@ -147,6 +150,7 @@ private:
 	double c_Yaw;
 	double c_Pitch;
 	GLfloat c_Fov;
+
 
 	std::vector<Component*> c_components;
 	Transform* c_transform;

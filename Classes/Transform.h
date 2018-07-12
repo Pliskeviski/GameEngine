@@ -102,7 +102,20 @@ public:
 	*/
 	Transform* getParent();
 
+	/*
+		@ return transform scale
+	*/
 	glm::vec3 getScale();
+
+	/*
+		@ define transform scale (x, y, z)
+	*/
+	void setScale(glm::vec3 scale);
+	/*
+	@ define transform scale (same for x, y, z)
+	*/
+	void setScale(float scale);
+
 
 	/*
 		@ return if is a child

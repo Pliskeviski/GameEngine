@@ -12,26 +12,35 @@
 #include "Component.h"
 #include "Mesh.h"
 #include "Transform.h"
+#include "Texture.h"
 
 class Object;
 
 class subMesh {
 public:
 	subMesh();
-	void Draw(Core::Director* director, Object* obj);
+	~subMesh();
+	void Draw(Core::Director* director, Transform* dad);
 
-	std::vector<glm::vec3> Vertices;
-	std::vector<glm::vec3> Normals;
-	std::vector<glm::vec3> Tangents;
-	std::vector<glm::vec3> BiTangents;
-	std::vector<glm::vec2> UVs;
-	std::vector<unsigned int> Indices;
+	/*
+		@ Add new texture to the subMesh
+	*/
+	void addTexture(std::string path, TextureType type);
+
+	glm::vec3* Vertices;
+	glm::vec3* Normals;
+	std::vector<glm::vec3> Tangents; // TODO
+	std::vector<glm::vec3> BiTangents; // TODO
+	glm::vec2* UVs;
+	unsigned short* Indices;
 	std::vector<GLuint> VBOs;
 	GLuint VAO;
 	GLuint VBO;
 	GLuint EBO;
+	unsigned int vertSize;
 	unsigned int drawSize;
-
-	Transform* dad_transform;
-
+	bool hasNormals;
+	bool hasUVs;
+	Transform* s_transform;
+	std::vector<Texture*> s_textures;
 };

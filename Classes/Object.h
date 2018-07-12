@@ -4,6 +4,7 @@
 #include <GL\glew.h>
 #include <glm\glm.hpp>
 
+#include "Director.h"
 #include "Component.h"
 #include "Transform.h"
 #include "Mesh.h"
@@ -55,6 +56,11 @@ public:
 	template<typename T>
 	void addComponent(T component);
 
+	/*
+		@ Draw Object
+		@ if has mesh component
+	*/
+	void draw(Core::Director* director);
 private:
 	std::vector<Component*> components;
 	bool Active;
@@ -70,12 +76,13 @@ inline T Object::getComponent() {
 		if (typeid(T) == typeid(Mesh*) && components[i]->type == MESH)
 			return (T)components[i];
 	}
+	return NULL;
 }
 
 template<typename T>
 inline void Object::addComponent(T component) {
-	if (component->type == MESH)
-		static_cast<Mesh*>(component)->setObject(this);
+	//if (component->type == MESH)
+	//	static_cast<Mesh*>(component)->setObject(this);
 
 	components.push_back(component);
 }
