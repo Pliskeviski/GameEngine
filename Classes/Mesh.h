@@ -19,12 +19,16 @@ public:
 	void Draw(Core::Director* director, Transform* parent);
 	void CreateBuffers(subMesh* s_mesh);
 
+	unsigned int getSubMeshCount();
+
 	/*
 		@ Returns submesh for index
 	*/
 	subMesh* operator[](unsigned int index);
 private:
 	GLuint genVBO(subMesh* m_mesh, GLsizeiptr size, GLint dataSize, const void* data, GLenum usage);
+	GLuint genIntVBO(subMesh* m_mesh, GLsizeiptr size, GLint dataSize, const void* data, GLenum usage);
 	std::vector<subMesh*> meshes;
 	void fileLoader(const char* filename, std::vector<subMesh*>& meshes);
+	unsigned int sMesh_cout;
 };

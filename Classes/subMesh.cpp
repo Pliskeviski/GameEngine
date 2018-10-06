@@ -1,7 +1,7 @@
 #include "subMesh.h"
 
 
-subMesh::subMesh() {
+subMesh::subMesh() : isActive(true) {
 }
 
 subMesh::~subMesh() {
@@ -10,6 +10,8 @@ subMesh::~subMesh() {
 }
 
 void subMesh::Draw(Core::Director* director, Transform* dad) {
+	if (!isActive)
+		return;
 	director->getShader()->Use();
 
 	glBindVertexArray(this->VAO);
@@ -20,17 +22,18 @@ void subMesh::Draw(Core::Director* director, Transform* dad) {
 	//GLuint MatrixID = glGetUniformLocation(director->getShader()->getID(), "MVP");
 
 	GLuint ViewID = glGetUniformLocation(director->getShader()->getID(), "view");
-	GLuint ProjectionID = glGetUniformLocation(director->getShader()->getID(), "projection");
 	GLuint ModelID = glGetUniformLocation(director->getShader()->getID(), "model");
+	GLuint ProjectionID = glGetUniformLocation(director->getShader()->getID(), "projection");
 
-	glm::mat4 Projection = glm::perspective(director->getCamera()->getFov(), (GLfloat)director->getCamera()->c_Width / (GLfloat)director->getCamera()->c_Height, 0.1f, 1000.0f);
-	glm::mat4 View    = director->getCamera()->getViewMatrix();
-	glm::mat4 Model   = glm::translate(glm::mat4(1.f), dad->getPosition() + this->s_transform->getPosition());
-	glm::mat4 ModelRX =    glm::rotate(glm::mat4(1.f), this->s_transform->getRotationX() + dad->getRotationX(), glm::vec3(1.0f, .0f, .0f));
-	glm::mat4 ModelRY =    glm::rotate(glm::mat4(1.f), this->s_transform->getRotationY() + dad->getRotationY(), glm::vec3(.0f, 1.0f, .0f));
-	glm::mat4 ModelRZ =    glm::rotate(glm::mat4(1.f), this->s_transform->getRotationZ() + dad->getRotationZ(), glm::vec3(.0f, .0f, 1.0f));
-	glm::mat4 ModelScale = glm::scale(glm::mat4(1.f), dad->getScale() * this->s_transform->getScale());
+	glm::mat4 Projection	= glm::perspective(director->getCamera()->getFov(), (GLfloat)director->getCamera()->c_Width / (GLfloat)director->getCamera()->c_Height, 0.1f, 1000.0f);
+	glm::mat4 View			= director->getCamera()->getViewMatrix();
+	glm::mat4 Model = glm::translate(glm::mat4(1.f), this->s_transform->getPosition() + dad->getPosition());
+	glm::mat4 ModelRX		= glm::rotate(glm::mat4(1.f), this->s_transform->getRotationX()   + dad->getRotationX(), glm::vec3(1.0f, .0f, .0f));
+	glm::mat4 ModelRY		= glm::rotate(glm::mat4(1.f), this->s_transform->getRotationY()   + dad->getRotationY(), glm::vec3(.0f, 1.0f, .0f));
+	glm::mat4 ModelRZ		= glm::rotate(glm::mat4(1.f), this->s_transform->getRotationZ()   + dad->getRotationZ(), glm::vec3(.0f, .0f, 1.0f));
+	glm::mat4 ModelScale    = glm::scale(glm::mat4(1.f), dad->getScale() * this->s_transform->getScale());
 	glm::mat4 ModelRotation = ModelRX * ModelRY * ModelRZ;
+	
 	Model *= ModelRotation * ModelScale;
 	//glm::mat4 MVP = Projection * View * Model;
 

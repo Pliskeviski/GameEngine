@@ -116,6 +116,16 @@ public:
 	*/
 	void setScale(float scale);
 
+	// Temp
+	glm::vec3& getVec3Pos() {
+		return this->t_position;
+	}
+	glm::vec3& getVec3Rot() {
+		return this->t_rotation;
+	}
+	glm::vec3& getVec3Scale() {
+		return this->t_scale;
+	}
 
 	/*
 		@ return if is a child

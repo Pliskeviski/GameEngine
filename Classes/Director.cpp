@@ -18,7 +18,6 @@ namespace Core {
 
 	void Director::CreateWindow(int screen_x, int screen_y, const char* name) {
 		Window* window = new Window(screen_x, screen_y, name);
-
 		setContexWindow(window); // Set as context window
 		
 		//glfwSetWindowSizeCallback(window->getWindow(), &windowResizeCallback); // TODO

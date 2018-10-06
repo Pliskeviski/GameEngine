@@ -37,7 +37,17 @@ public:
 	/*
 		@ get current active state
 	*/
-	bool isActive();
+	bool& isActive();
+
+	/*
+		@ set object name
+	*/
+	void setName(const char* name);
+
+	/*
+		@ get object name
+	*/
+	char* getName();
 
 	/*
 		@ get any component
@@ -64,18 +74,19 @@ public:
 private:
 	std::vector<Component*> components;
 	bool Active;
+	std::string o_name;
 };
 
 template<typename T>
 inline T Object::getComponent() {
-	for (unsigned int i = 0; i < components.size(); i++) {
-		// Transform
-		if (typeid(T) == typeid(Transform*) && components[i]->type == TRANSFORM)
-			return (T)components[i];
-		// Mesh
-		if (typeid(T) == typeid(Mesh*) && components[i]->type == MESH)
-			return (T)components[i];
-	}
+	//for (unsigned int i = 0; i < components.size(); i++) {
+	//	// Transform
+	//	if (typeid(T) == typeid(Transform*) && components[i]->type == TRANSFORM)
+	//		return (T)components[i];
+	//	// Mesh
+	//	if (typeid(T) == typeid(Mesh*) && components[i]->type == MESH)
+	//		return (T)components[i];
+	//}
 	return NULL;
 }
 

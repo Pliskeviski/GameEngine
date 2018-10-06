@@ -1,7 +1,5 @@
 #include "String.h"
 
-// Not ready yet
-
 pl::string::string(const char* string) : s_size(0) {
 	inMemory = new unsigned char;
 	*inMemory = 1;

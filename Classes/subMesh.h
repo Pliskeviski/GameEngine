@@ -43,4 +43,6 @@ public:
 	bool hasUVs;
 	Transform* s_transform;
 	std::vector<Texture*> s_textures;
+	std::string sMesh_name;
+	bool isActive;
 };

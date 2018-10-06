@@ -17,7 +17,10 @@ void Mesh::Draw(Core::Director* director, Transform* parent) {
 
 void Mesh::fileLoader(const char* filename, std::vector<subMesh*>& meshes) {
 	FILE* fileB = fopen(filename, "rb");
+	std::cout << filename << std::endl;
 	assert(fileB);
+
+
 
 	unsigned int m_meshes;
 	fread(&m_meshes, sizeof(int), 1, fileB);
@@ -36,7 +39,8 @@ void Mesh::fileLoader(const char* filename, std::vector<subMesh*>& meshes) {
 		}
 
 		subMesh* submesh = new subMesh;
-		
+		this->sMesh_cout++;
+		submesh->sMesh_name = std::string("SubMesh " + std::to_string(i)).c_str();
 		// Read info about Vertices size and Indices size
 		glm::vec3 info; 
 		fread(&info, sizeof(glm::vec3), 1, file);
@@ -112,6 +116,10 @@ void Mesh::CreateBuffers(subMesh* s_mesh) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, s_mesh->drawSize * sizeof(unsigned short), &s_mesh->Indices[0], GL_STATIC_DRAW);
 }
 
+unsigned int Mesh::getSubMeshCount(){
+	return this->sMesh_cout;
+}
+
 subMesh* Mesh::operator[](unsigned int index) {
 	return this->meshes[index];
 }
@@ -129,6 +137,22 @@ GLuint Mesh::genVBO(subMesh* m_mesh, GLsizeiptr size, GLint dataSize, const void
 	glEnableVertexAttribArray(m_mesh->VBOs.size());
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glVertexAttribPointer(m_mesh->VBOs.size(), dataSize, GL_FLOAT, GL_FALSE, 0, 0);
+
+	return buffer;
+}
+
+GLuint Mesh::genIntVBO(subMesh* m_mesh, GLsizeiptr size, GLint dataSize, const void* data, GLenum usage) {
+
+	glBindVertexArray(m_mesh->VAO);
+
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+
+	glEnableVertexAttribArray(m_mesh->VBOs.size());
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glVertexAttribIPointer(m_mesh->VBOs.size(), dataSize, GL_INT, 0, 0);
 
 	return buffer;
 }
