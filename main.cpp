@@ -77,37 +77,47 @@ int main() {
 	unsigned int g_size = 10;
 	Grid grid_floor(10, 10);
 
+	/*
+		ImGui list of objects
+		TESTING ONLY
+	*/
+	std::vector<Object*> i_obj;
+	Object* selected = NULL;
+	subMesh* selected_sub = NULL;
+
 	Object* obj = new Object;
-	//Mesh* mesh = new Mesh("Models\\Misc\\cubies.ple");
-	Mesh* mesh = new Mesh("Models\\Revolver\\Colt_Python.ple");
-	(*mesh)[0]->addTexture("Models\\Revolver\\diffuse.tga", TYPE_DIFFUSE);
-	//Mesh* mesh = new Mesh("Models\\Coffe\\cup_low_poly.ple");
-	//(*mesh)[0]->addTexture("Models\\Coffe\\cup_BaseColor.tga", TYPE_DIFFUSE);
+	obj->setName("Plane");
+	Mesh* mesh = new Mesh("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Biplano\\biplane_complete.ple");
 	obj->addComponent(mesh);
+	(*mesh)[0]->addTexture("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Biplano\\prop_biplane_last.jpg",   TYPE_DIFFUSE); 
+	(*mesh)[1]->addTexture("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Biplano\\biplano_last.jpg",		   TYPE_DIFFUSE); 
+	(*mesh)[2]->addTexture("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Biplano\\wheels_biplane_last.jpg", TYPE_DIFFUSE); 
+	(*mesh)[3]->addTexture("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Biplano\\flaps_biplane_last.jpg",  TYPE_DIFFUSE); 
+	(*mesh)[4]->addTexture("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Biplano\\prop_biplane_last.jpg",   TYPE_DIFFUSE); 
+	obj->getComponent<Transform*>()->setScale(1.f);
+	obj->getComponent<Transform*>()->setPositionX(10.f);
 
-	Object* cup = new Object;
-	Mesh* meshCup = new Mesh("Models\\Coffe\\cup_low_poly.ple");
-	(*meshCup)[0]->addTexture("Models\\Coffe\\cup_BaseColor.tga", TYPE_DIFFUSE);
-	cup->addComponent(meshCup);
+	Object* sniper = new Object;
+	sniper->setName("Scania");
+	Mesh* sniper_mesh = new Mesh("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Scania\\scania.ple");
+	sniper->addComponent(sniper_mesh);
+	(*sniper_mesh)[4]->addTexture("C:\\Users\\Gustavo\\source\\repos\\Threads\\Models\\Scania\\textures\\tex1.tga", TYPE_DIFFUSE);
+	sniper->getComponent<Transform*>()->setScale(.01f);
 
-	obj->getComponent<Transform*>()->setPosition(glm::vec3(2.f, 1.f, 1.f));
-	cup->getComponent<Transform*>()->setPosition(glm::vec3(1.f, 2.f, 0.f));
-
-	//tmp
-	obj->getComponent<Transform*>()->setScale(0.08f);
-	cup->getComponent<Transform*>()->setScale(0.08f);
-	subMesh* m = (*mesh)[0];
-
-	Object* cubies = new Object;
-	Mesh* meshCubies = new Mesh("Models\\Misc\\cubies.ple");
-	cubies->addComponent(meshCubies);
-	cubies->getComponent<Transform*>()->setPositionX(-10.f);
+	// ImGui vector
+	i_obj.push_back(sniper);
+	i_obj.push_back(obj);
 
 	director->getCamera()->setPositionY(4.f);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_DEPTH_TEST);
 	float zz = 0;
+
+	// ImGui
+	static int listbox_item_current = -1;
+	static int list_box_sub = -1;
 	while (glfwGetKey(director->getWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(director->getWindow()) == 0) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwPollEvents();
@@ -202,17 +212,90 @@ int main() {
 			director->getCamera()->c_Width = ImGui::GetWindowWidth();
 			director->getCamera()->c_Height = ImGui::GetWindowHeight() * .93f;
 
-			glEnable(GL_DEPTH_TEST);
 
 			grid_floor.Draw(camera, glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight() * .93f));
 		}
-		obj->getComponent<Transform*>()->setRotationY(sin(zz+=0.05f));
-		//(*mesh)[0]->s_transform->setRotation(glm::vec3(zz += 0.1f));
+
+		{ // ImGui props
+			ImGui::Begin("Options");
+
+			std::vector<char*> t;
+
+			for (int ind = 0; ind < i_obj.size(); ind++)
+				t.push_back(i_obj[ind]->getName());
+
+			unsigned int last = listbox_item_current;
+			ImGui::ListBox("Objects", &listbox_item_current, &t[0], t.size());
+			if (last != listbox_item_current) {
+				selected = i_obj[listbox_item_current];
+				list_box_sub = -1;
+			}
+
+			if (selected != NULL) {
+				// Render object options
+				
+				ImGui::Checkbox("isActive", &selected->isActive());
+				
+				float* v3[3];
+				v3[0] = &selected->getComponent<Transform*>()->getVec3Pos().x;
+				v3[1] = &selected->getComponent<Transform*>()->getVec3Pos().y;
+				v3[2] = &selected->getComponent<Transform*>()->getVec3Pos().z;
+
+				float* s3[3];
+				s3[0] = &selected->getComponent<Transform*>()->getVec3Scale().x;
+				s3[1] = &selected->getComponent<Transform*>()->getVec3Scale().y;
+				s3[2] = &selected->getComponent<Transform*>()->getVec3Scale().z;
+
+				float* r3[3];
+				r3[0] = &selected->getComponent<Transform*>()->getVec3Rot().x;
+				r3[1] = &selected->getComponent<Transform*>()->getVec3Rot().y;
+				r3[2] = &selected->getComponent<Transform*>()->getVec3Rot().z;
+
+				ImGui::DragFloat3("Selected position", v3[0], .25f, -100000, 100000, "%.3f", 1.f);
+				ImGui::DragFloat3("Selected rotation", r3[0], .25f, -100000, 100000, "%.3f", 1.f);
+				ImGui::DragFloat3("Selected scale",    s3[0], .25f, -100000, 100000, "%.3f", 1.f);
+				
+				{ // submesh list
+					std::vector<const char*> sub;
+					for (int indd = 0; indd < selected->getComponent<Mesh*>()->getSubMeshCount(); indd++) {
+						sub.push_back((*selected->getComponent<Mesh*>())[indd]->sMesh_name.c_str());
+					}
+
+					unsigned int lastt = list_box_sub;
+					ImGui::ListBox("SubMeshes", &list_box_sub, &sub[0], sub.size());
+					if (lastt != list_box_sub) {
+						selected_sub = (*selected->getComponent<Mesh*>())[list_box_sub];
+					}
+					if (selected_sub != NULL) {
+						// Submesh options
+						ImGui::Checkbox("subMesh isActive", &selected_sub->isActive);
+						float* vv3[3];
+						vv3[0] = &selected_sub->s_transform->getVec3Pos().x;
+						vv3[1] = &selected_sub->s_transform->getVec3Pos().y;
+						vv3[2] = &selected_sub->s_transform->getVec3Pos().z;
+
+						float* ss3[3];
+						ss3[0] = &selected_sub->s_transform->getVec3Scale().x;
+						ss3[1] = &selected_sub->s_transform->getVec3Scale().y;
+						ss3[2] = &selected_sub->s_transform->getVec3Scale().z;
+
+						float* rr3[3];
+						rr3[0] = &selected_sub->s_transform->getVec3Rot().x;
+						rr3[1] = &selected_sub->s_transform->getVec3Rot().y;
+						rr3[2] = &selected_sub->s_transform->getVec3Rot().z;
+
+						ImGui::DragFloat3("Selected-sub position", vv3[0], .1f, -100000, 100000, "%.3f", 1.f);
+						ImGui::DragFloat3("Selected-sub rotation", rr3[0], .1f, -100000, 100000, "%.3f", 1.f);
+						ImGui::DragFloat3("Selected-sub scale",    ss3[0], .1f, -100000, 100000, "%.3f", 1.f);
+					}
+				}
+			}
+
+			ImGui::End();
+		}
+
 		obj->draw(director);
-		cup->draw(director);
-		cubies->draw(director);
-		cubies->getComponent<Transform*>()->setPositionX((zz += 0.05f));
-		(*meshCubies)[1]->s_transform->setPositionX(sin(zz += 0.1f));
+		sniper->draw(director);
 
 		{
 			// OpenGL view
